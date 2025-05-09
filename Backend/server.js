@@ -13,19 +13,33 @@ const port = process.env.PORT || 3000;
 // Connect to database and Cloudinary
 connectDB();
 connectCloudinary();
-// Configure CORS properly
+
+// Define allowed origins
+const allowedOrigins = [
+  "http://localhost:5173", // User frontend
+  "http://localhost:5174", // Admin frontend
+];
+
+// Configure CORS
 const corsOptions = {
-  origin: "http://localhost:5173", // Your frontend origin
-  credentials: true, // Required when using withCredentials
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g., Postman) or from allowed origins
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "token"],
+  allowedHeaders: ["Content-Type", "Authorization", "token", "atoken"],
 };
 
 // Middleware
 app.use(express.json());
 app.use(cors(corsOptions));
 
-//api user routes
+// API user routes
 app.use("/api/user", userRouter);
 
 // API endpoints
