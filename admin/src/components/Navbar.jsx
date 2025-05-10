@@ -2,23 +2,22 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout as adminLogout } from "../redux/features/admin/adminSlice";
-import { clearDoctorData } from "../redux/features/doctors/doctorSlice";
+import { logout as doctorLogout } from "../redux/features/doctors/doctorSlice";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const { atoken } = useSelector((state) => state.admin);
-  const { token: dtoken } = useSelector((state) => state.doctor); // Use token instead of dtoken
+  const { dtoken } = useSelector((state) => state.doctor);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleLogout = () => {
     if (atoken) {
-      // Admin logout
-      localStorage.removeItem("atoken");
       dispatch(adminLogout());
+      toast.success("Admin logged out successfully");
     } else if (dtoken) {
-      // Doctor logout
-      localStorage.removeItem("dtoken"); // Match Login component
-      dispatch(clearDoctorData());
+      dispatch(doctorLogout());
+      toast.success("Doctor logged out successfully");
     }
     navigate("/login", { replace: true });
   };
@@ -40,19 +39,23 @@ const Navbar = () => {
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-medium ${
                 atoken
                   ? "bg-blue-50 text-blue-700 ring-1 ring-blue-700/20"
-                  : "bg-yellow-50 text-yellow-800 ring-1 ring-yellow-600/20"
+                  : dtoken
+                  ? "bg-yellow-50 text-yellow-800 ring1 ring-yellow-600/20"
+                  : "bg-gray-50 text-gray-600 ring-1 ring-gray-200"
               }`}
             >
               {userRole}
             </span>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className="inline-flex items-center justify-center rounded px-3 py-1 text-sm font-semibold text-red-600 hover:text-white hover:bg-red-600 ring-1 ring-red-200 transition-all duration-200 ease-in-out"
-          >
-            Logout
-          </button>
+          {(atoken || dtoken) && (
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center justify-center rounded px-3 py-1 text-sm font-semibold text-red-600 hover:text-white hover:bg-red-600 ring-1 ring-red-200 transition-all duration-200 ease-in-out"
+            >
+              Logout
+            </button>
+          )}
         </div>
       </div>
     </nav>

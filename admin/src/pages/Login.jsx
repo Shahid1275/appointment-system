@@ -1,67 +1,72 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { setAToken } from "../redux/features/admin/adminSlice";
-import { setDoctorToken } from "../redux/features/doctors/doctorSlice";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { loginDoctor } from "../redux/features/doctors/doctorSlice";
+import { setAToken } from "../redux/features/admin/adminSlice";
 
-// Set API base URL from environment variables
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+const API_BASE_URL =
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { atoken } = useSelector((state) => state.admin);
-  const { token: dtoken } = useSelector((state) => state.doctor); // Use token instead of dtoken
+  const { dtoken, loading } = useSelector((state) => state.doctor);
   const [state, setState] = useState("Admin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (atoken) {
-      navigate("/admin-dashboard", { replace: true });
-    } else if (dtoken) {
-      navigate("/doctor-dashboard", { replace: true });
-    }
+    const checkAuth = () => {
+      console.log("Login useEffect: atoken:", atoken, "dtoken:", dtoken);
+      if (atoken) {
+        navigate("/admin-dashboard", { replace: true });
+      } else if (dtoken) {
+        navigate("/doctor-dashboard", { replace: true });
+      }
+    };
+
+    // Small delay to ensure Redux state is updated
+    const timer = setTimeout(checkAuth, 100);
+    return () => clearTimeout(timer);
   }, [atoken, dtoken, navigate]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     if (!email || !password) {
       toast.error("Please enter both email and password");
-      setLoading(false);
       return;
     }
 
     try {
-      const endpoint =
-        state === "Admin"
-          ? `${API_BASE_URL}/admin/login`
-          : `${API_BASE_URL}/api/doctor/login`;
+      if (state === "Admin") {
+        const response = await fetch(`${API_BASE_URL}/admin/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await response.json();
 
-      const { data } = await axios.post(endpoint, { email, password });
-
-      if (data?.success) {
-        const tokenKey = state === "Admin" ? "atoken" : "dtoken"; // Use consistent key
-        localStorage.setItem(tokenKey, data.token);
-
-        // Dispatch correct action based on user type
-        if (state === "Admin") {
+        if (data?.success) {
+          localStorage.setItem("atoken", data.token);
           dispatch(setAToken(data.token));
+          toast.success("Welcome Admin!");
           navigate("/admin-dashboard", { replace: true });
         } else {
-          dispatch(setDoctorToken(data.token));
+          toast.error(data?.message || "Invalid credentials");
+        }
+      } else {
+        // Use Redux thunk for doctor login
+        const result = await dispatch(
+          loginDoctor({ email, password })
+        ).unwrap();
+        if (result.success) {
+          toast.success("Welcome Doctor!");
           navigate("/doctor-dashboard", { replace: true });
         }
-
-        toast.success(`Welcome ${state}!`);
-      } else {
-        toast.error(data?.message || "Invalid credentials");
       }
     } catch (error) {
       const errorMsg =
@@ -69,8 +74,6 @@ const Login = () => {
         error.message ||
         "Login failed. Please try again.";
       toast.error(errorMsg);
-    } finally {
-      setLoading(false);
     }
   };
 

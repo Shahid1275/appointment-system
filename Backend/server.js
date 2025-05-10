@@ -44,7 +44,7 @@ app.use("/api/user", userRouter);
 
 // API endpoints
 app.use("/admin", adminRouter);
-app.use("/api/doctor", doctorRouter);
+app.use("/api/doctors", doctorRouter);
 app.get("/", (req, res) => {
   res.send("API is working Good 👍");
 });

@@ -5,9 +5,11 @@ import { assets } from "../assets/assets";
 
 const SideBar = () => {
   const { atoken } = useSelector((state) => state.admin);
-  const { token: dtoken } = useSelector((state) => state.doctor);
+  const { dtoken } = useSelector((state) => state.doctor); // Use dtoken directly
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // console.log("SideBar: atoken:", atoken, "dtoken:", dtoken); // Debug logging
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -18,7 +20,7 @@ const SideBar = () => {
   };
 
   // Common NavLink styles
-  const navLinkStyles = (isActive) =>
+  const navLinkStyles = ({ isActive }) =>
     `group flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
       isActive
         ? "bg-blue-50 text-blue-700 shadow-sm"
@@ -94,7 +96,7 @@ const SideBar = () => {
                   <NavLink
                     key={item.to}
                     to={item.to}
-                    className={({ isActive }) => navLinkStyles(isActive)}
+                    className={navLinkStyles}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <img
@@ -110,7 +112,7 @@ const SideBar = () => {
                   <NavLink
                     key={item.to}
                     to={item.to}
-                    className={({ isActive }) => navLinkStyles(isActive)}
+                    className={navLinkStyles}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <img
@@ -137,11 +139,7 @@ const SideBar = () => {
             <nav className="space-y-2">
               {atoken &&
                 adminNavItems.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    className={({ isActive }) => navLinkStyles(isActive)}
-                  >
+                  <NavLink key={item.to} to={item.to} className={navLinkStyles}>
                     <img
                       src={item.icon}
                       alt={item.label.toLowerCase()}
@@ -158,11 +156,7 @@ const SideBar = () => {
                 ))}
               {dtoken &&
                 doctorNavItems.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    className={({ isActive }) => navLinkStyles(isActive)}
-                  >
+                  <NavLink key={item.to} to={item.to} className={navLinkStyles}>
                     <img
                       src={item.icon}
                       alt={item.label.toLowerCase()}
@@ -208,8 +202,6 @@ const SideBar = () => {
           </div>
         </div>
       </aside>
-
-      {/* Overlay removed as per request */}
     </>
   );
 };

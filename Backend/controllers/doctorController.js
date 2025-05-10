@@ -1,6 +1,112 @@
+// import doctorModel from "../models/doctorsModel.js";
+// import jwt from "jsonwebtoken";
+// import bcrypt from "bcrypt";
+// import appointmentModel from "../models/appointmentModel.js";
+// const changeAvailability = async (req, res) => {
+//   try {
+//     const { docId } = req.body;
+//     const docData = await doctorModel.findById(docId);
+//     if (!docData) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Doctor not found" });
+//     }
+//     await doctorModel.findByIdAndUpdate(docId, {
+//       available: !docData.available,
+//     });
+//     res
+//       .status(200)
+//       .json({ success: true, message: "Availability changed successfully" });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
+// const doctorList = async (req, res) => {
+//   try {
+//     const doctors = await doctorModel.find({}).select("-password -email");
+//     if (!doctors.length) {
+//       return res
+//         .status(200)
+//         .json({ success: true, data: [], message: "No doctors found" });
+//     }
+//     res.json({ success: true, data: doctors });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
+// const doctorLogin = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     // Check if doctor exists
+//     const doctor = await doctorModel.findOne({ email });
+//     if (!doctor) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Doctor not found" });
+//     }
+
+//     // Compare passwords
+//     const isMatch = await bcrypt.compare(password, doctor.password);
+//     if (!isMatch) {
+//       return res
+//         .status(401)
+//         .json({ success: false, message: "Invalid credentials" });
+//     }
+
+//     // Create token
+//     const token = jwt.sign({ id: doctor._id }, process.env.JWT_SECRET, {
+//       expiresIn: "1d", // Recommended to add expiration
+//     });
+
+//     // Successful login response
+//     res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token,
+//       doctor: {
+//         id: doctor._id,
+//         name: doctor.name,
+//         email: doctor.email,
+//         // Add other relevant doctor fields if needed
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Login error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//       error: error.message,
+//     });
+//   }
+// };
+
+// //api to get all appointments for doctor panel
+
+// const appointmentsDoctor = async (req, res) => {
+//   try {
+//     const { docId } = req.body;
+//     const appointments = await appointmentModel.find({ docId });
+//     res.status(200).json(appointments);
+//   } catch (error) {
+//     console.error("Appointment of  Doctor Face error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//       error: error.message,
+//     });
+//   }
+// };
+// export { changeAvailability, doctorList, doctorLogin, appointmentsDoctor };
 import doctorModel from "../models/doctorsModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import appointmentModel from "../models/appointmentModel.js";
+
 const changeAvailability = async (req, res) => {
   try {
     const { docId } = req.body;
@@ -41,7 +147,6 @@ const doctorLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if doctor exists
     const doctor = await doctorModel.findOne({ email });
     if (!doctor) {
       return res
@@ -49,7 +154,6 @@ const doctorLogin = async (req, res) => {
         .json({ success: false, message: "Doctor not found" });
     }
 
-    // Compare passwords
     const isMatch = await bcrypt.compare(password, doctor.password);
     if (!isMatch) {
       return res
@@ -57,12 +161,10 @@ const doctorLogin = async (req, res) => {
         .json({ success: false, message: "Invalid credentials" });
     }
 
-    // Create token
     const token = jwt.sign({ id: doctor._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d", // Recommended to add expiration
+      expiresIn: "1d",
     });
 
-    // Successful login response
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -71,7 +173,6 @@ const doctorLogin = async (req, res) => {
         id: doctor._id,
         name: doctor.name,
         email: doctor.email,
-        // Add other relevant doctor fields if needed
       },
     });
   } catch (error) {
@@ -84,4 +185,20 @@ const doctorLogin = async (req, res) => {
   }
 };
 
-export { changeAvailability, doctorList, doctorLogin };
+const appointmentsDoctor = async (req, res) => {
+  try {
+    const doctor = req.user;
+    console.log("[appointmentsDoctor] Authenticated doctor:", doctor);
+    const appointments = await appointmentModel.find({ docId: doctor._id });
+    res.status(200).json({ success: true, data: appointments });
+  } catch (error) {
+    console.error("Error fetching doctor appointments:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export { changeAvailability, doctorList, doctorLogin, appointmentsDoctor };
