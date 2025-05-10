@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
 import doctorModel from "../models/doctorsModel.js";
 import jwt from "jsonwebtoken";
+import appointmentModel from "../models/appointmentModel.js";
 
 // API for adding doctor
 const addDoctor = async (req, res) => {
@@ -153,4 +154,82 @@ const allDoctors = async (req, res) => {
   }
 };
 
-export { addDoctor, adminLogin, allDoctors };
+//api to display all appointments in admin panel
+const adminAppointments = async (req, res) => {
+  try {
+    const appointments = await appointmentModel.find({});
+    res.status(200).json({
+      success: true,
+      data: appointments,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+//api for cancel an apointment
+const appointmentCancel = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+
+    if (!appointmentId) {
+      return res.status(400).json({
+        success: false,
+        message: "Appointment ID is required",
+      });
+    }
+
+    const appointment = await appointmentModel.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found",
+      });
+    }
+
+    // Check if already cancelled
+    if (appointment.cancelled) {
+      return res.status(400).json({
+        success: false,
+        message: "Appointment already cancelled",
+      });
+    }
+
+    // Update appointment status
+    const updatedAppointment = await appointmentModel.findByIdAndUpdate(
+      appointmentId,
+      { cancelled: true, status: "cancelled" },
+      { new: true }
+    );
+
+    // Release doctor slot
+    const { docId, slotDate, slotTime } = appointment;
+    await doctorModel.findByIdAndUpdate(docId, {
+      $pull: { [`slots_booked.${slotDate}`]: slotTime },
+    });
+
+    res.json({
+      success: true,
+      message: "Appointment cancelled",
+      appointment: updatedAppointment,
+    });
+  } catch (error) {
+    console.error("Cancel appointment error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+export {
+  addDoctor,
+  adminLogin,
+  allDoctors,
+  adminAppointments,
+  appointmentCancel,
+};

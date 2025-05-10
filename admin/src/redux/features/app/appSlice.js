@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  // List of doctors for the user-facing app
   currencySymbol: "$", // Currency symbol for UI display
 };
 
@@ -11,8 +10,13 @@ const appSlice = createSlice({
   reducers: {},
 });
 
-// Export actions for use in components
-// export const { setDoctors } = appSlice.actions;
+// Utility function to calculate age
+export const calculateAge = (dob) => {
+  const today = new Date();
+  const birthDate = new Date(dob);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  return age;
+};
 
 // Export reducer
 export default appSlice.reducer;

@@ -297,7 +297,7 @@ const AppointmentsPage = () => {
                           ) : (
                             <>
                               <CreditCardIcon className="h-4 w-4 mr-1" />
-                              Pay Now
+                              Pay online
                             </>
                           )}
                         </button>
@@ -307,7 +307,7 @@ const AppointmentsPage = () => {
                           }
                           className="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         >
-                          Cancel
+                          Cancel appointment
                         </button>
                       </>
                     )}
