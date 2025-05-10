@@ -5,6 +5,7 @@ import { assets } from "../assets/assets";
 
 const SideBar = () => {
   const { atoken } = useSelector((state) => state.admin);
+  const { token: dtoken } = useSelector((state) => state.doctor);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -24,8 +25,8 @@ const SideBar = () => {
         : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
     }`;
 
-  // Navigation items data
-  const navItems = [
+  // Admin navigation items
+  const adminNavItems = [
     { to: "/admin-dashboard", icon: assets.home_icon, label: "Dashboard" },
     {
       to: "/all-appointments",
@@ -34,6 +35,21 @@ const SideBar = () => {
     },
     { to: "/add-doctor", icon: assets.add_icon, label: "Add Doctors" },
     { to: "/doctors-list", icon: assets.people_icon, label: "Doctors List" },
+  ];
+
+  // Doctor navigation items
+  const doctorNavItems = [
+    { to: "/doctor-dashboard", icon: assets.home_icon, label: "Dashboard" },
+    {
+      to: "/doctor-appointments",
+      icon: assets.appointment_icon,
+      label: "Appointments",
+    },
+    {
+      to: "/doctor-profile",
+      icon: assets.people_icon,
+      label: "Profile",
+    },
   ];
 
   return (
@@ -66,15 +82,15 @@ const SideBar = () => {
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 transform ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } md:hidden transition-transform duration-300 ease-in-out z-40 shadow-xl`}
+        className={`fixed inset-y-0 left-0 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out z-40 shadow-xl ${
+          isMobileMenuOpen ? "w-full translate-x-0" : "-translate-x-full w-0"
+        } md:hidden`}
       >
         <div className="flex flex-col h-full">
           <div className="flex-1 px-3 py-4 space-y-1 mt-16 overflow-y-auto">
-            {atoken && (
-              <nav className="space-y-2">
-                {navItems.map((item) => (
+            <nav className="space-y-2">
+              {atoken &&
+                adminNavItems.map((item) => (
                   <NavLink
                     key={item.to}
                     to={item.to}
@@ -89,8 +105,23 @@ const SideBar = () => {
                     <span>{item.label}</span>
                   </NavLink>
                 ))}
-              </nav>
-            )}
+              {dtoken &&
+                doctorNavItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    className={({ isActive }) => navLinkStyles(isActive)}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <img
+                      src={item.icon}
+                      alt={item.label.toLowerCase()}
+                      className="w-5 h-5 group-hover:scale-110 transition-transform"
+                    />
+                    <span>{item.label}</span>
+                  </NavLink>
+                ))}
+            </nav>
           </div>
         </div>
       </aside>
@@ -103,9 +134,9 @@ const SideBar = () => {
       >
         <div className="flex flex-col h-full">
           <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            {atoken && (
-              <nav className="space-y-2">
-                {navItems.map((item) => (
+            <nav className="space-y-2">
+              {atoken &&
+                adminNavItems.map((item) => (
                   <NavLink
                     key={item.to}
                     to={item.to}
@@ -125,8 +156,28 @@ const SideBar = () => {
                     )}
                   </NavLink>
                 ))}
-              </nav>
-            )}
+              {dtoken &&
+                doctorNavItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    className={({ isActive }) => navLinkStyles(isActive)}
+                  >
+                    <img
+                      src={item.icon}
+                      alt={item.label.toLowerCase()}
+                      className={`w-5 h-5 group-hover:scale-110 transition-transform ${
+                        isCollapsed ? "mx-auto" : ""
+                      }`}
+                    />
+                    {!isCollapsed && (
+                      <span className="transition-opacity duration-200">
+                        {item.label}
+                      </span>
+                    )}
+                  </NavLink>
+                ))}
+            </nav>
           </div>
 
           {/* Collapse/Expand Button */}
@@ -158,13 +209,7 @@ const SideBar = () => {
         </div>
       </aside>
 
-      {/* Overlay for mobile */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
-          onClick={toggleMobileMenu}
-        />
-      )}
+      {/* Overlay removed as per request */}
     </>
   );
 };

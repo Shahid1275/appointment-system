@@ -1,103 +1,3 @@
-// import React, { useEffect } from "react";
-// import { useSelector, useDispatch } from "react-redux";
-// import {
-//   cancelAppointment,
-//   getallAppointments,
-// } from "../../redux/features/admin/adminSlice";
-// import { calculateAge } from "../../redux/features/app/appSlice";
-// import { assets } from "../../assets/assets";
-
-// const AllAppointment = () => {
-//   const dispatch = useDispatch();
-//   const { atoken, appointments } = useSelector((state) => state.admin);
-//   const { currencySymbol } = useSelector((state) => state.app);
-
-//   useEffect(() => {
-//     if (atoken) dispatch(getallAppointments());
-//   }, [atoken, dispatch]);
-
-//   return (
-//     <div className="w-full max-w-6xl m-5 ml-0 md:ml-64 p-5 min-h-screen transition-all duration-300">
-//       <div className="max-w-7xl mx-auto">
-//         <h1 className="text-2xl font-bold text-gray-800 mb-6">
-//           All Appointments
-//         </h1>
-//         <div className="bg-white border rounded text-sm max-h-[80vh] overflow-y-scroll">
-//           {/* Desktop Table Header */}
-//           <div className="hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] border-b py-3 px-6 text-gray-600 font-medium">
-//             <p>#</p>
-//             <p>Patient</p>
-//             <p>Age</p>
-//             <p>Date & Time</p>
-//             <p>Doctor</p>
-//             <p>Fees</p>
-//             <p>Actions</p>
-//           </div>
-//           {/* Appointments List */}
-//           {appointments.map((item, index) => (
-//             <div
-//               key={index}
-//               className="grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 px-3 py-3 border-b hover:bg-gray-50 max-sm:grid-cols-1 max-sm:gap-1 max-sm:py-4"
-//             >
-//               {/* Desktop Table Row */}
-//               <p className="max-sm:hidden">{index + 1}</p>
-//               <div className="flex items-center gap-2">
-//                 <img
-//                   className="w-8 rounded-full"
-//                   src={item.userData.image}
-//                   alt={item.userData.name}
-//                   onError={(e) => (e.target.src = "/fallback-image.png")}
-//                 />
-//                 <p className="font-medium">{item.userData.name}</p>
-//               </div>
-//               <p className="max-sm:text-xs max-sm:ml-10">
-//                 <span className="sm:hidden font-medium">Age: </span>
-//                 {item.userData.dob ? calculateAge(item.userData.dob) : "N/A"}
-//               </p>
-//               <p className="max-sm:text-xs max-sm:ml-10">
-//                 <span className="sm:hidden font-medium">Date: </span>
-//                 {new Date(item.date).toLocaleString("en-US", {
-//                   dateStyle: "medium",
-//                   timeStyle: "short",
-//                 })}
-//               </p>
-//               <div className="flex items-center gap-2">
-//                 <img
-//                   className="w-8 rounded-full bg-gray-200"
-//                   src={item.docData.image}
-//                   alt=""
-//                   onError={(e) => (e.target.src = "/fallback-image.png")}
-//                 />
-//                 <p className="font-medium">{item.docData.name}</p>
-//               </div>
-//               <p className="max-sm:text-xs max-sm:ml-10">
-//                 <span className="sm:hidden font-medium">Fees: </span>
-//                 {currencySymbol}
-//                 {item.amount}
-//               </p>
-//               {item.cancelled ? (
-//                 <p className="text-red-400 text-xs font-medium">Cancelled</p>
-//               ) : (
-//                 <img
-//                   onClick={() => dispatch(cancelAppointment(item._id))}
-//                   className="w-10 cursor-pointer "
-//                   src={assets.cancel_icon}
-//                 />
-//               )}
-//             </div>
-//           ))}
-//           {appointments.length === 0 && (
-//             <div className="text-center py-10 text-gray-500">
-//               No appointments found.
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AllAppointment;
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -117,29 +17,31 @@ const AllAppointment = () => {
   }, [atoken, dispatch]);
 
   return (
-    <div className="w-full max-w-6xl m-5 ml-0 md:ml-64 p-5 min-h-screen transition-all duration-300">
+    <div className="w-full m-4 ml-0 md:ml-64 p-4 min-h-screen transition-all duration-300">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h1 className="text-2xl font-bold text-gray-800">All Appointments</h1>
-          <p className="text-sm text-gray-500 mt-1">
+        <div className="px-4 py-4 sm:px-6 border-b border-gray-100">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
+            All Appointments
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             {appointments.length} total appointments
           </p>
         </div>
 
         {/* Table Container */}
         <div className="overflow-x-auto">
-          {/* Desktop Table */}
-          <table className="hidden md:table w-full">
+          {/* Desktop and Tablet Table */}
+          <table className="hidden md:table w-full text-left">
             <thead className="bg-gray-50">
-              <tr className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <th className="px-6 py-3">#</th>
-                <th className="px-6 py-3">Patient</th>
-                <th className="px-6 py-3">Age</th>
-                <th className="px-6 py-3">Date & Time</th>
-                <th className="px-6 py-3">Doctor</th>
-                <th className="px-6 py-3">Fees</th>
-                <th className="px-6 py-3 text-right">Actions</th>
+              <tr className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 sm:px-6">#</th>
+                <th className="px-4 py-3 sm:px-6">Patient</th>
+                <th className="px-4 py-3 sm:px-6">Age</th>
+                <th className="px-4 py-3 sm:px-6">Date & Time</th>
+                <th className="px-4 py-3 sm:px-6">Doctor</th>
+                <th className="px-4 py-3 sm:px-6">Fees</th>
+                <th className="px-4 py-3 sm:px-6 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -148,54 +50,54 @@ const AllAppointment = () => {
                   key={index}
                   className="hover:bg-gray-50 transition-colors duration-150"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-4 py-3 sm:px-6 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     {index + 1}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 sm:px-6 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
+                      <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
                         <img
-                          className="h-10 w-10 rounded-full object-cover"
+                          className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover"
                           src={item.userData.image || assets.default_user}
                           alt={item.userData.name}
                           onError={(e) => (e.target.src = assets.default_user)}
                         />
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                      <div className="ml-3 sm:ml-4">
+                        <div className="text-xs sm:text-sm font-medium text-gray-900">
                           {item.userData.name}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-xs text-gray-500">
                           {item.userData.phone || "No phone"}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-4 py-3 sm:px-6 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     {item.userData.dob
                       ? calculateAge(item.userData.dob)
                       : "N/A"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                  <td className="px-4 py-3 sm:px-6 whitespace-nowrap">
+                    <div className="text-xs sm:text-sm text-gray-900">
                       {new Date(item.date).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
                       })}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-xs text-gray-500">
                       {new Date(item.date).toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 sm:px-6 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
+                      <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
                         <img
-                          className="h-10 w-10 rounded-full object-cover bg-gray-200"
+                          className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover bg-gray-200"
                           src={item.docData.image || assets.default_doctor}
                           alt={item.docData.name}
                           onError={(e) =>
@@ -203,34 +105,34 @@ const AllAppointment = () => {
                           }
                         />
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                      <div className="ml-3 sm:ml-4">
+                        <div className="text-xs sm:text-sm font-medium text-gray-900">
                           {item.docData.name}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-xs text-gray-500">
                           {item.docData.speciality}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 sm:px-6 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                     {currencySymbol}
                     {item.amount}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-4 py-3 sm:px-6 whitespace-nowrap text-right text-sm font-medium">
                     {item.cancelled ? (
-                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                      <span className="px-2 sm:px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                         Cancelled
                       </span>
                     ) : (
                       <button
                         onClick={() => dispatch(cancelAppointment(item._id))}
-                        className="cursor-pointer text-red-600 hover:text-red-900 transition-colors duration-200 "
+                        className="cursor-pointer text-red-600 hover:text-red-900 transition-colors duration-200"
                         title="Cancel Appointment"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 ml-2 mr-5"
+                          className="h-5 w-5 sm:ml-2 sm:mr-5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -250,26 +152,26 @@ const AllAppointment = () => {
             </tbody>
           </table>
 
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-4 p-4">
+          {/* Mobile and Small Devices Cards */}
+          <div className="md:hidden space-y-3 p-3 sm:p-4">
             {appointments.map((item, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg shadow-xs border border-gray-200 p-4"
+                className="bg-white rounded-lg shadow-xs border border-gray-200 p-3 sm:p-4"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex items-center space-x-3">
                     <img
-                      className="h-12 w-12 rounded-full object-cover"
+                      className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover"
                       src={item.userData.image || assets.default_user}
                       alt={item.userData.name}
                       onError={(e) => (e.target.src = assets.default_user)}
                     />
                     <div>
-                      <h3 className="font-medium text-gray-900">
+                      <h3 className="text-sm sm:text-base font-medium text-gray-900">
                         {item.userData.name}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500">
                         Age:{" "}
                         {item.userData.dob
                           ? calculateAge(item.userData.dob)
@@ -284,7 +186,7 @@ const AllAppointment = () => {
                   ) : (
                     <button
                       onClick={() => dispatch(cancelAppointment(item._id))}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -304,7 +206,7 @@ const AllAppointment = () => {
                   )}
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="mt-3 sm:mt-4 grid grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <p className="text-xs text-gray-500">Date & Time</p>
                     <p className="text-sm font-medium">
@@ -313,7 +215,7 @@ const AllAppointment = () => {
                         day: "numeric",
                       })}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-gray-500">
                       {new Date(item.date).toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -324,7 +226,7 @@ const AllAppointment = () => {
                     <p className="text-xs text-gray-500">Doctor</p>
                     <div className="flex items-center mt-1">
                       <img
-                        className="h-6 w-6 rounded-full object-cover mr-2 bg-gray-200"
+                        className="h-5 w-5 sm:h-6 sm:w-6 rounded-full object-cover mr-2 bg-gray-200"
                         src={item.docData.image || assets.default_doctor}
                         alt={item.docData.name}
                         onError={(e) => (e.target.src = assets.default_doctor)}
@@ -337,8 +239,10 @@ const AllAppointment = () => {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                  <p className="text-sm text-gray-500">Appointment Fee</p>
+                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 flex justify-between items-center">
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Appointment Fee
+                  </p>
                   <p className="text-sm font-medium">
                     {currencySymbol}
                     {item.amount}
@@ -351,7 +255,7 @@ const AllAppointment = () => {
 
         {/* Empty State */}
         {appointments.length === 0 && (
-          <div className="p-12 text-center">
+          <div className="p-8 sm:p-12 text-center">
             <svg
               className="mx-auto h-12 w-12 text-gray-400"
               fill="none"

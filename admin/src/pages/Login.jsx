@@ -1,18 +1,32 @@
-import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { setAToken } from "../redux/features/admin/adminSlice";
+import { setDoctorToken } from "../redux/features/doctors/doctorSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+// Set API base URL from environment variables
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Login = () => {
-  const { backendUrl } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { atoken } = useSelector((state) => state.admin);
+  const { token: dtoken } = useSelector((state) => state.doctor); // Use token instead of dtoken
   const [state, setState] = useState("Admin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (atoken) {
+      navigate("/admin-dashboard", { replace: true });
+    } else if (dtoken) {
+      navigate("/doctor-dashboard", { replace: true });
+    }
+  }, [atoken, dtoken, navigate]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -27,16 +41,25 @@ const Login = () => {
     try {
       const endpoint =
         state === "Admin"
-          ? `${backendUrl}/admin/login`
-          : `${backendUrl}/doctor/login`;
+          ? `${API_BASE_URL}/admin/login`
+          : `${API_BASE_URL}/api/doctor/login`;
 
       const { data } = await axios.post(endpoint, { email, password });
 
       if (data?.success) {
-        localStorage.setItem("atoken", data.token);
-        dispatch(setAToken(data.token));
+        const tokenKey = state === "Admin" ? "atoken" : "dtoken"; // Use consistent key
+        localStorage.setItem(tokenKey, data.token);
+
+        // Dispatch correct action based on user type
+        if (state === "Admin") {
+          dispatch(setAToken(data.token));
+          navigate("/admin-dashboard", { replace: true });
+        } else {
+          dispatch(setDoctorToken(data.token));
+          navigate("/doctor-dashboard", { replace: true });
+        }
+
         toast.success(`Welcome ${state}!`);
-        navigate("/admin-dashboard");
       } else {
         toast.error(data?.message || "Invalid credentials");
       }
@@ -62,7 +85,7 @@ const Login = () => {
         </p>
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-gray-700">Email</p>
+          <label className="text-sm font-medium text-gray-700">Email</label>
           <input
             onChange={(e) => setEmail(e.target.value)}
             value={email}
@@ -73,7 +96,7 @@ const Login = () => {
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-gray-700">Password</p>
+          <label className="text-sm font-medium text-gray-700">Password</label>
           <input
             onChange={(e) => setPassword(e.target.value)}
             value={password}
@@ -93,27 +116,15 @@ const Login = () => {
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        {state === "Admin" ? (
-          <p className="text-center text-sm text-gray-600">
-            Doctor Login?{" "}
-            <span
-              onClick={() => setState("Doctor")}
-              className="text-blue-600 cursor-pointer hover:underline"
-            >
-              click here
-            </span>
-          </p>
-        ) : (
-          <p className="text-center text-sm text-gray-600">
-            Admin Login?{" "}
-            <span
-              onClick={() => setState("Admin")}
-              className="text-blue-600 cursor-pointer hover:underline"
-            >
-              click here
-            </span>
-          </p>
-        )}
+        <p className="text-center text-sm text-gray-600">
+          {state === "Admin" ? "Doctor Login?" : "Admin Login?"}{" "}
+          <span
+            onClick={() => setState(state === "Admin" ? "Doctor" : "Admin")}
+            className="text-blue-600 cursor-pointer hover:underline"
+          >
+            click here
+          </span>
+        </p>
       </div>
     </form>
   );

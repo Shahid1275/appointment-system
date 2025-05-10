@@ -1,29 +1,21 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logout as adminLogout } from "../redux/features/admin/adminSlice";
-import { clearDoctorData } from "../redux/features/doctors/doctorSlice";
+import { logout } from "../redux/features/admin/adminSlice";
 
 const Navbar = () => {
-  const { atoken } = useSelector((state) => state.admin);
-  const { token: dtoken } = useSelector((state) => state.doctor); // Use token instead of dtoken
+  const { dtoken } = useSelector((state) => state.doctor);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleLogout = () => {
-    if (atoken) {
-      // Admin logout
-      localStorage.removeItem("atoken");
-      dispatch(adminLogout());
-    } else if (dtoken) {
-      // Doctor logout
-      localStorage.removeItem("dtoken"); // Match Login component
-      dispatch(clearDoctorData());
-    }
+    // Remove token from localStorage
+    localStorage.removeItem("dtoken");
+    // Dispatch logout action to clear Redux state
+    dispatch(logout());
+    // Navigate to login page immediately
     navigate("/login", { replace: true });
   };
-
-  const userRole = atoken ? "Admin" : dtoken ? "Doctor" : "Guest";
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white border-b border-gray-200">
@@ -38,12 +30,12 @@ const Navbar = () => {
             </h2>
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-medium ${
-                atoken
-                  ? "bg-blue-50 text-blue-700 ring-1 ring-blue-700/20"
-                  : "bg-yellow-50 text-yellow-800 ring-1 ring-yellow-600/20"
+                dtoken
+                  ? "bg-yellow-50 text-yellow-800 ring-1 ring-yellow-600/20"
+                  : "bg-blue-50 text-blue-700 ring-1 ring-blue-700/20"
               }`}
             >
-              {userRole}
+              {dtoken ? "Admin" : "Doctor"}
             </span>
           </div>
 

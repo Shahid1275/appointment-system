@@ -3,6 +3,7 @@ import upload from "../middlewares/multer.js";
 import {
   addDoctor,
   adminAppointments,
+  adminDashboard,
   adminLogin,
   allDoctors,
   appointmentCancel,
@@ -18,4 +19,5 @@ adminRouter.post("/all-doctors", adminAuth, allDoctors);
 adminRouter.post("/change-availability", adminAuth, changeAvailability);
 adminRouter.get("/appointments", adminAuth, adminAppointments);
 adminRouter.post("/cancel-appointment", adminAuth, appointmentCancel);
+adminRouter.get("/dashboard", adminAuth, adminDashboard);
 export default adminRouter;

@@ -18,6 +18,12 @@ const initialState = {
   backendUrl: import.meta.env.VITE_BACKEND_URL || "http://localhost:3000",
   doctors: [],
   appointments: [],
+  dashboardData: {
+    patients: 0,
+    doctors: 0,
+    appointments: 0,
+    latestAppointments: [],
+  },
   loading: false,
   error: null,
 };
@@ -46,6 +52,7 @@ export const adminSlice = createSlice({
       state.adminMode = false;
       state.doctors = [];
       state.appointments = [];
+      state.dashboardData = initialState.dashboardData;
       try {
         localStorage.removeItem("atoken");
       } catch (error) {
@@ -59,6 +66,11 @@ export const adminSlice = createSlice({
     },
     setAppointments: (state, action) => {
       state.appointments = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setDashboardData: (state, action) => {
+      state.dashboardData = action.payload;
       state.loading = false;
       state.error = null;
     },
@@ -80,7 +92,41 @@ export const adminSlice = createSlice({
   },
 });
 
-// Async action to change availability
+// Async action to fetch admin dashboard data
+export const fetchAdminDashboard = createAsyncThunk(
+  "admin/fetchAdminDashboard",
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    const { backendUrl, atoken } = getState().admin;
+
+    try {
+      dispatch(setLoading(true));
+      const response = await axios.get(`${backendUrl}/admin/dashboard`, {
+        headers: { atoken },
+      });
+
+      const { data } = response;
+      if (data.success) {
+        dispatch(setDashboardData(data.data));
+        console.log(data.data);
+        return data.data;
+      } else {
+        dispatch(setError(data.message || "Failed to fetch dashboard data"));
+        toast.error(data.message || "Failed to fetch dashboard data");
+        return rejectWithValue(
+          data.message || "Failed to fetch dashboard data"
+        );
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message;
+      console.error("Error in fetchAdminDashboard:", errorMessage);
+      dispatch(setError(errorMessage));
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// Existing async actions (unchanged)
 export const changeAvailability = (docId) => async (dispatch, getState) => {
   const { backendUrl, atoken } = getState().admin;
 
@@ -105,7 +151,6 @@ export const changeAvailability = (docId) => async (dispatch, getState) => {
   }
 };
 
-// Async action to fetch all doctors
 export const fetchAllDoctors = () => async (dispatch, getState) => {
   const { backendUrl, atoken } = getState().admin;
 
@@ -131,7 +176,6 @@ export const fetchAllDoctors = () => async (dispatch, getState) => {
   }
 };
 
-// Async action to fetch all appointments
 export const getallAppointments = createAsyncThunk(
   "admin/getallAppointments",
   async (_, { getState, dispatch, rejectWithValue }) => {
@@ -145,7 +189,6 @@ export const getallAppointments = createAsyncThunk(
 
       const { data } = response;
       if (data.success) {
-        console.log(data);
         dispatch(setAppointments(data.data || []));
         return data.data;
       } else {
@@ -163,7 +206,6 @@ export const getallAppointments = createAsyncThunk(
   }
 );
 
-// Async action to cancel an appointment
 export const cancelAppointment = createAsyncThunk(
   "admin/cancelAppointment",
   async (appointmentId, { getState, dispatch, rejectWithValue }) => {
@@ -209,6 +251,7 @@ export const {
   logout,
   setDoctors,
   setAppointments,
+  setDashboardData,
   setLoading,
   setError,
   updateDoctorAvailability,
