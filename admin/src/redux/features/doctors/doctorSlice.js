@@ -21,7 +21,9 @@ const initialState = {
   loading: false,
   error: null,
 };
+// Add this with other createAsyncThunk actions
 
+// The rest of the slice remains unchanged
 export const loginDoctor = createAsyncThunk(
   "doctor/loginDoctor",
   async ({ email, password }, { dispatch, rejectWithValue }) => {
@@ -66,7 +68,42 @@ export const loginDoctor = createAsyncThunk(
     }
   }
 );
+export const getDashData = createAsyncThunk(
+  "doctor/getDashData",
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    const { backendUrl, dtoken } = getState().doctor;
 
+    try {
+      dispatch(setLoading(true));
+      const response = await axios.get(`${backendUrl}/api/doctors/dashboard`, {
+        headers: { Authorization: `Bearer ${dtoken}` },
+      });
+
+      const { data } = response;
+      if (data.success) {
+        dispatch(setLoading(false));
+        console.log(data);
+        return data;
+      } else {
+        dispatch(setError(data.message || "Failed to fetch dashboard data"));
+        toast.error(data.message || "Failed to fetch dashboard data");
+        dispatch(setLoading(false));
+        return rejectWithValue(
+          data.message || "Failed to fetch dashboard data"
+        );
+      }
+    } catch (error) {
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch dashboard data";
+      dispatch(setError(errorMsg));
+      toast.error(errorMsg);
+      dispatch(setLoading(false));
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
 export const fetchDoctorAppointments = createAsyncThunk(
   "doctor/fetchDoctorAppointments",
   async (_, { getState, dispatch, rejectWithValue }) => {
