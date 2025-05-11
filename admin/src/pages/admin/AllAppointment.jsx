@@ -136,6 +136,8 @@ const AllAppointment = () => {
                         <span className="px-2 sm:px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                           Cancelled
                         </span>
+                      ) : item.isCompleted ? (
+                        <p className="text-green-500">Completed</p>
                       ) : (
                         <button
                           onClick={() => dispatch(cancelAppointment(item._id))}

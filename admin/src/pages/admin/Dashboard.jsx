@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchAdminDashboard } from "../../redux/features/admin/adminSlice";
 import { assets } from "../../assets/assets";
-
+import { cancelAppointment } from "../../redux/features/admin/adminSlice";
 const Dashboard = () => {
   const dispatch = useDispatch();
   const { dashboardData, atoken, loading, error } = useSelector(
@@ -142,17 +142,20 @@ const Dashboard = () => {
                   </div>
                 </div>
                 {item.cancelled ? (
-                  <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                  <span className="px-2 sm:px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                     Cancelled
                   </span>
+                ) : item.isCompleted ? (
+                  <p className="text-green-500">Completed</p>
                 ) : (
                   <button
-                    className="cursor-pointer text-red-600 hover:text-red-900 transition-colors duration-200 "
+                    onClick={() => dispatch(cancelAppointment(item._id))}
+                    className="cursor-pointer text-red-600 hover:text-red-900 transition-colors duration-200"
                     title="Cancel Appointment"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 ml-2 mr-5"
+                      className="h-5 w-5 sm:ml-2 sm:mr-5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

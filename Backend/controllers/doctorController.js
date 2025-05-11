@@ -183,13 +183,14 @@ const doctorDashboard = async (req, res) => {
   }
 };
 
-a; //api to get doctor profile for doctor panel
+//api to get doctor profile for doctor panel
 const doctorProfile = async (req, res) => {
   try {
-    // const docId = req.user.id;
-    const { docId } = req.body;
-    const profileData = await doctorModel.findById(docId).select("password");
+    const docId = req.user.id;
+    // const { docId } = req.body;
+    const profileData = await doctorModel.findById(docId);
     res.json({ success: true, profileData });
+    console.log(profileData);
   } catch (error) {
     console.error("Error fetching doctor profile:", error);
     res.status(500).json({

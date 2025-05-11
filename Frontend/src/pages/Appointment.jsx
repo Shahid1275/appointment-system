@@ -52,6 +52,12 @@ const Appointments = () => {
   };
 
   const getAvailableSlots = async () => {
+    // Skip slot generation if doctor is unavailable
+    if (!docInfo.available) {
+      setDoctorSlots([]);
+      return;
+    }
+
     setDoctorSlots([]);
     let today = new Date();
     const updatedDocInfo = doctors.find((doc) => doc._id === docId);
@@ -127,6 +133,12 @@ const Appointments = () => {
       return navigate("/my-profile");
     }
 
+    if (!docInfo.available) {
+      toast.error("Doctor is not available for booking");
+      setIsBooking(false);
+      return;
+    }
+
     if (!slotTime || !docInfo || docSlots.length === 0) {
       toast.error("Please select a valid time slot");
       setIsBooking(false);
@@ -158,7 +170,9 @@ const Appointments = () => {
       setSlotTime("");
       navigate("/myappointments");
     } catch (error) {
-      toast.error(error.message || "Failed to book appointment");
+      const errorMsg = error.message || "Failed to book appointment";
+      toast.error(errorMsg); // Will show "Doctor is not available" if backend rejects
+      console.error("Booking error:", error);
     } finally {
       setIsBooking(false);
     }
@@ -173,12 +187,14 @@ const Appointments = () => {
       getAvailableSlots();
     }
   }, [docInfo]);
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }, [docId]);
+
   const handleDayChange = (index) => {
     setSlotIndex(index);
     setSlotTime("");
@@ -236,6 +252,35 @@ const Appointments = () => {
               {docInfo.fees}
             </span>
           </p>
+          {/* Availability Indicator */}
+          <div className="mt-4 flex items-center gap-2">
+            <span
+              className={`h-5 w-5 rounded border-2 ${
+                docInfo.available
+                  ? "border-green-600 bg-green-100"
+                  : "border-red-600 bg-red-100"
+              } flex items-center justify-center`}
+            >
+              {docInfo.available && (
+                <svg
+                  className="w-4 h-4 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+            </span>
+            <span className="text-gray-600 text-sm font-medium">
+              {docInfo.available ? "Available" : "Unavailable"}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -243,104 +288,114 @@ const Appointments = () => {
       <div className="mt-8 sm:ml-72 sm:pl-4">
         <h3 className="text-lg font-semibold text-gray-700">Booking Slots</h3>
 
-        {/* Day Selector */}
-        <div className="flex gap-3 items-center w-full overflow-x-auto mt-4 pb-2 scrollbar-hide">
-          {docSlots.length > 0 &&
-            docSlots.map((item, index) => {
-              if (item.length === 0) return null;
+        {docInfo.available ? (
+          <>
+            {/* Day Selector */}
+            <div className="flex gap-3 items-center w-full overflow-x-auto mt-4 pb-2 scrollbar-hide">
+              {docSlots.length > 0 &&
+                docSlots.map((item, index) => {
+                  if (item.length === 0) return null;
 
-              const dayIndex = item[0].datetime.getDay();
-              const dateNum = item[0].datetime.getDate();
-              const monthNum = item[0].datetime.getMonth() + 1;
+                  const dayIndex = item[0].datetime.getDay();
+                  const dateNum = item[0].datetime.getDate();
+                  const monthNum = item[0].datetime.getMonth() + 1;
 
-              return (
-                <div
-                  onClick={() => handleDayChange(index)}
-                  className={`text-center py-4 px-4 min-w-[80px] rounded-lg cursor-pointer transition-all duration-200 ${
-                    slotIndex === index
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "border border-gray-200 bg-white hover:bg-gray-50 shadow-sm"
-                  }`}
-                  key={index}
-                >
-                  <p className="text-sm font-medium">{daysOfWeek[dayIndex]}</p>
-                  <p className="text-lg font-semibold">
-                    {dateNum}/{monthNum}
-                  </p>
-                </div>
-              );
-            })}
-        </div>
-
-        {/* Time Slots */}
-        <div className="flex flex-row-reverse gap-3 items-center w-full overflow-x-auto snap-x snap-mandatory mt-4 pb-4 scrollbar-hide">
-          {docSlots.length > 0 && docSlots[slotIndex]?.length > 0 ? (
-            docSlots[slotIndex].map((item, index) => (
-              <button
-                onClick={() => setSlotTime(item.time)}
-                className={`text-center text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 min-w-[5rem] snap-center ${
-                  item.time === slotTime
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "border border-gray-300 text-gray-600 hover:bg-gray-100 cursor-pointer"
-                }`}
-                key={index}
-              >
-                {new Date(item.datetime).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
+                  return (
+                    <div
+                      onClick={() => handleDayChange(index)}
+                      className={`text-center py-4 px-4 min-w-[80px] rounded-lg cursor-pointer transition-all duration-200 ${
+                        slotIndex === index
+                          ? "bg-blue-600 text-white shadow-md"
+                          : "border border-gray-200 bg-white hover:bg-gray-50 shadow-sm"
+                      }`}
+                      key={index}
+                    >
+                      <p className="text-sm font-medium">
+                        {daysOfWeek[dayIndex]}
+                      </p>
+                      <p className="text-lg font-semibold">
+                        {dateNum}/{monthNum}
+                      </p>
+                    </div>
+                  );
                 })}
-              </button>
-            ))
-          ) : (
-            <p className="text-sm text-gray-500">
-              No slots available for this day
-            </p>
-          )}
-        </div>
+            </div>
 
-        {/* Book Button */}
-        <div className="mt-6">
-          <button
-            onClick={bookappointment}
-            className={`w-full sm:w-auto cursor-pointer px-8 py-3 rounded-full font-medium text-base transition-all duration-300 shadow-md ${
-              slotTime && status !== "loading" && !isBooking
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-            disabled={!slotTime || status === "loading" || isBooking}
-          >
-            {status === "loading" || isBooking ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Processing...
-              </span>
-            ) : slotTime ? (
-              `Book Appointment for ${currencySymbol}${docInfo.fees}`
-            ) : (
-              "Select a time slot"
-            )}
-          </button>
-        </div>
+            {/* Time Slots */}
+            <div className="flex flex-row-reverse gap-3 items-center w-full overflow-x-auto snap-x snap-mandatory mt-4 pb-4 scrollbar-hide">
+              {docSlots.length > 0 && docSlots[slotIndex]?.length > 0 ? (
+                docSlots[slotIndex].map((item, index) => (
+                  <button
+                    onClick={() => setSlotTime(item.time)}
+                    className={`text-center text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 min-w-[5rem] snap-center ${
+                      item.time === slotTime
+                        ? "bg-blue-600 text-white shadow-md"
+                        : "border border-gray-300 text-gray-600 hover:bg-gray-100 cursor-pointer"
+                    }`}
+                    key={index}
+                  >
+                    {new Date(item.datetime).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </button>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">
+                  No slots available for this day
+                </p>
+              )}
+            </div>
+
+            {/* Book Button */}
+            <div className="mt-6">
+              <button
+                onClick={bookappointment}
+                className={`w-full sm:w-auto cursor-pointer px-8 py-3 rounded-full font-medium text-base transition-all duration-300 shadow-md ${
+                  slotTime && status !== "loading" && !isBooking
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+                disabled={!slotTime || status === "loading" || isBooking}
+              >
+                {status === "loading" || isBooking ? (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : slotTime ? (
+                  `Book Appointment for ${currencySymbol}${docInfo.fees}`
+                ) : (
+                  "Select a time slot"
+                )}
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="mt-4 p-4 bg-red-100 text-red-800 rounded-lg">
+            Doctor is not available for booking at this time.
+          </div>
+        )}
       </div>
 
       {/* Related Doctors */}

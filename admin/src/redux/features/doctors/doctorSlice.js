@@ -22,7 +22,63 @@ const initialState = {
   error: null,
 };
 // Add this with other createAsyncThunk actions
+// ... (previous imports and initialState remain unchanged)
 
+export const updateProfileData = createAsyncThunk(
+  "doctor/updateProfileData",
+  async (updatedData, { getState, dispatch, rejectWithValue }) => {
+    const { backendUrl, dtoken } = getState().doctor;
+    const docId = getState().doctor.profileData?._id; // Assuming profileData contains _id
+
+    if (!docId) {
+      const errorMsg = "Doctor ID not available. Please reload the profile.";
+      dispatch(setError(errorMsg));
+      toast.error(errorMsg);
+      return rejectWithValue(errorMsg);
+    }
+
+    try {
+      dispatch(setLoading(true));
+      const response = await axios.post(
+        `${backendUrl}/api/doctors/update-profile`,
+        {
+          docId,
+          fees: parseFloat(updatedData.fees) || 0,
+          address: {
+            address1: updatedData.address.address1,
+            address2: updatedData.address.address2,
+          },
+          available: updatedData.available,
+        },
+        { headers: { Authorization: `Bearer ${dtoken}` } }
+      );
+
+      const { data } = response;
+      if (data.success) {
+        dispatch(setProfileData(data.updatedData)); // Update with the new profile data from the server
+        toast.success("Profile updated successfully");
+        dispatch(setLoading(false));
+        return data;
+      } else {
+        dispatch(setError(data.message || "Failed to update profile"));
+        toast.error(data.message || "Failed to update profile");
+        dispatch(setLoading(false));
+        return rejectWithValue(data.message || "Failed to update profile");
+      }
+    } catch (error) {
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update profile";
+      dispatch(setError(errorMsg));
+      toast.error(errorMsg);
+      dispatch(setLoading(false));
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
+
+// ... (rest of the slice, including reducers and exports, remains unchanged)
 export const getProfileData = createAsyncThunk(
   "doctor/getProfileData",
   async (_, { getState, dispatch, rejectWithValue }) => {
@@ -36,8 +92,8 @@ export const getProfileData = createAsyncThunk(
 
       const { data } = response;
       if (data.success) {
-        dispatch(setProfileData(data.data || data)); // Store profile data
-        console.log(data);
+        dispatch(setProfileData(data.profileData)); // Store only profileData object
+        console.log("Profile Data:", data);
         dispatch(setLoading(false));
         return data;
       } else {
