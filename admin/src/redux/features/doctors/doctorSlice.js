@@ -12,17 +12,52 @@ const getInitialToken = () => {
     return "";
   }
 };
-
 const initialState = {
   backendUrl: import.meta.env.VITE_BACKEND_URL || "http://localhost:3000",
   dtoken: getInitialToken(),
   doctorData: null,
   appointments: [],
+  profileData: null, // Added to store profile data
   loading: false,
   error: null,
 };
 // Add this with other createAsyncThunk actions
 
+export const getProfileData = createAsyncThunk(
+  "doctor/getProfileData",
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    const { backendUrl, dtoken } = getState().doctor;
+
+    try {
+      dispatch(setLoading(true));
+      const response = await axios.get(`${backendUrl}/api/doctors/profile`, {
+        headers: { Authorization: `Bearer ${dtoken}` },
+      });
+
+      const { data } = response;
+      if (data.success) {
+        dispatch(setProfileData(data.data || data)); // Store profile data
+        console.log(data);
+        dispatch(setLoading(false));
+        return data;
+      } else {
+        dispatch(setError(data.message || "Failed to fetch profile data"));
+        toast.error(data.message || "Failed to fetch profile data");
+        dispatch(setLoading(false));
+        return rejectWithValue(data.message || "Failed to fetch profile data");
+      }
+    } catch (error) {
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch profile data";
+      dispatch(setError(errorMsg));
+      toast.error(errorMsg);
+      dispatch(setLoading(false));
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
 // The rest of the slice remains unchanged
 export const loginDoctor = createAsyncThunk(
   "doctor/loginDoctor",
@@ -322,6 +357,11 @@ export const doctorSlice = createSlice({
       state.appointments = action.payload;
       state.error = null;
     },
+    setProfileData: (state, action) => {
+      // New reducer for profile data
+      state.profileData = action.payload;
+      state.error = null;
+    },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
@@ -333,6 +373,7 @@ export const doctorSlice = createSlice({
       state.dtoken = "";
       state.doctorData = null;
       state.appointments = [];
+      state.profileData = null; // Clear profile data on logout
       state.error = null;
       try {
         localStorage.removeItem("dtoken");
@@ -350,6 +391,7 @@ export const {
   setDoctorToken,
   setDoctorData,
   setAppointments,
+  setProfileData, // Export new reducer
   setLoading,
   setError,
   logout,
