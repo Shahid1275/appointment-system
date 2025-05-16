@@ -9,7 +9,6 @@ import appointmentModel from "../models/appointmentModel.js";
 
 // Validation constants
 const MIN_PASSWORD_LENGTH = 8;
-const TOKEN_EXPIRATION = "1d";
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
 
@@ -149,9 +148,7 @@ const loginUser = async (req, res) => {
     });
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: TOKEN_EXPIRATION,
-    });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
     // Return success response (excluding sensitive data)
     const userResponse = {
