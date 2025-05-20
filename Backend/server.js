@@ -14,12 +14,12 @@ connectDB();
 connectCloudinary();
 
 // Define allowed origins for production
-const allowedOrigins = [
-  "http://localhost:5173", // User frontend (local)
-  "http://localhost:5174", // Admin frontend (local)
-  "https://your-frontend.vercel.app", // Add your frontend Vercel URL
-  "https://your-admin-frontend.vercel.app", // Add admin frontend Vercel URL
-];
+// const allowedOrigins = [
+//   "http://localhost:5173", // User frontend (local)
+//   "http://localhost:5174", // Admin frontend (local)
+//   "https://your-frontend.vercel.app", // Add your frontend Vercel URL
+//   "https://your-admin-frontend.vercel.app", // Add admin frontend Vercel URL
+// ];
 
 // Configure CORS
 const corsOptions = {
@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
 });
 
 // Export for Vercel (remove app.listen)
-export default app;
+// export default app;
 
 // For local development only
 if (process.env.NODE_ENV !== "production") {
