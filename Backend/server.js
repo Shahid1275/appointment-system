@@ -72,4 +72,5 @@ app.get("/", (req, res) => {
   res.send("API is working Good 👍");
 });
 
-module.exports = app; // Export the app for Vercel
+// Export the app for Vercel
+module.exports = app;
