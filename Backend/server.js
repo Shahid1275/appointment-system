@@ -48,13 +48,26 @@ import userRouter from "./routes/userRoute.js";
 
 const app = express();
 
-// Connect to database and Cloudinary
-connectDB();
-connectCloudinary();
+// Connect to database and Cloudinary with error handling
+try {
+  connectDB();
+  console.log("MongoDB connected successfully");
+} catch (dbError) {
+  console.error("MongoDB connection error:", dbError);
+  throw dbError; // This will log the error in Vercel and crash the function for debugging
+}
+
+try {
+  connectCloudinary();
+  console.log("Cloudinary connected successfully");
+} catch (cloudinaryError) {
+  console.error("Cloudinary connection error:", cloudinaryError);
+  throw cloudinaryError;
+}
 
 // Configure CORS
 const corsOptions = {
-  origin: true,
+  origin: process.env.FRONTEND_URL || "http://localhost:5173", // Use dynamic origin
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "token", "atoken"],
