@@ -55,10 +55,10 @@ cd doctor-appointment-system
 
 
 ### Backend Configuration (./backend/.env)
-MONGO_URI=mongodb://localhost:27017/doctor_appointment
-JWT_SECRET=your_secure_jwt_secret
-PORT=3000
-CLOUDINARY_CLOUD_NAME=your_cloud_name
+-MONGO_URI=mongodb://localhost:27017/doctor_appointment
+=JWT_SECRET=your_secure_jwt_secret
+-PORT=3000
+-CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 STRIPE_SECRET_KEY=your_stripe_secret_key
@@ -71,41 +71,16 @@ SMTP_PASS=your_email_password
 
 
 ## Frontend Configuration (./frontend/.env)
-VITE_API_URL=http://localhost:3000/api
-VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
-VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+- VITE_API_URL=http://localhost:3000/api
+- VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+- VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
 
 
 
 
 ## Admin Configuration (./admin/.env)
-VITE_API_URL=http://localhost:3000/api
-VITE_ADMIN_SECRET=your_admin_secret
-
-
-
-## 🏗 System Architecture
-doctor-appointment-system/
-├── backend/
-│   ├── config/        # Configuration files
-│   ├── controllers/   # Business logic
-│   ├── middleware/    # Authentication
-│   ├── models/        # Database schemas
-│   ├── routes/        # API endpoints
-│   ├── services/      # Third-party integrations
-│   └── utils/         # Helper functions
-├── frontend/
-│   ├── public/        # Static assets
-│   └── src/
-│       ├── assets/    # Images, fonts
-│       ├── components # Reusable UI
-│       ├── features/  # Feature modules
-│       ├── hooks/     # Custom hooks
-│       ├── pages/     # Route components
-│       ├── redux/     # State management
-│       ├── services/  # API clients
-│       └── styles/    # Global styles
-└── admin/             # Admin panel (similar structure)
+- VITE_API_URL=http://localhost:3000/api
+- VITE_ADMIN_SECRET=your_admin_secret
 
 
 
