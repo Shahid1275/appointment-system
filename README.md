@@ -48,12 +48,13 @@ A complete healthcare management solution with patient, doctor, and administrati
 - Stripe account
 
 ### Installation
-```bash
+
 # Clone the repository
 git clone https://github.com/yourusername/doctor-appointment-system.git
 cd doctor-appointment-system
 
 
+### Backend Configuration (./backend/.env)
 MONGO_URI=mongodb://localhost:27017/doctor_appointment
 JWT_SECRET=your_secure_jwt_secret
 PORT=3000
@@ -66,25 +67,59 @@ SMTP_PORT=587
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_email_password
 
-## Frontend (.env)
-VITE_API_URL=http://localhost:5173
+
+
+
+## Frontend Configuration (./frontend/.env)
+VITE_API_URL=http://localhost:3000/api
 VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
 
 
-## Admin (.env)
-VITE_API_URL=http://localhost:5174
+
+
+## Admin Configuration (./admin/.env)
+VITE_API_URL=http://localhost:3000/api
 VITE_ADMIN_SECRET=your_admin_secret
 
 
+
+## 🏗 System Architecture
+doctor-appointment-system/
+├── backend/
+│   ├── config/        # Configuration files
+│   ├── controllers/   # Business logic
+│   ├── middleware/    # Authentication
+│   ├── models/        # Database schemas
+│   ├── routes/        # API endpoints
+│   ├── services/      # Third-party integrations
+│   └── utils/         # Helper functions
+├── frontend/
+│   ├── public/        # Static assets
+│   └── src/
+│       ├── assets/    # Images, fonts
+│       ├── components # Reusable UI
+│       ├── features/  # Feature modules
+│       ├── hooks/     # Custom hooks
+│       ├── pages/     # Route components
+│       ├── redux/     # State management
+│       ├── services/  # API clients
+│       └── styles/    # Global styles
+└── admin/             # Admin panel (similar structure)
+
+
+
 ## Running the System
+Development Mode
 # Backend
-cd backend && npm install && npm start
+cd backend && npm install && npm run dev
 
 # Frontend (Patient)
 cd ../frontend && npm install && npm run dev
 
 # Admin Panel
 cd ../admin && npm install && npm run dev
+
 
 
 🗃️ Database Setup
@@ -99,12 +134,14 @@ Verify:
 sudo systemctl status mongod
 
 
+
 ☁️ Cloudinary Setup
 Sign up at Cloudinary
 
 Get credentials from dashboard
 
 Add to backend/.env
+
 
 
 💳 Stripe Setup
@@ -116,13 +153,25 @@ Add to both backend and frontend .env files
 
 
 
-🤝 Contributing
+## Prduction
+# Backend
+cd backend && npm install && npm start
+
+# Frontend
+cd ../frontend && npm install && npm run build
+
+# Admin
+cd ../admin && npm install && npm run build
+
+
+
+🤝 Contributing Guidelines
 Fork the repository
 
-Create your feature branch (git checkout -b feature/AmazingFeature)
+Create feature branch: git checkout -b feature/feature-name
 
-Commit your changes (git commit -m 'Add some amazing feature')
+Commit changes: git commit -m "Descriptive message"
 
-Push to the branch (git push origin feature/AmazingFeature)
+Push to branch: git push origin feature/feature-name
 
-Open a pull request
+Open pull request with detailed description
