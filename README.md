@@ -42,3 +42,16 @@ A comprehensive medical appointment platform with patient, doctor, and admin int
 ```bash
 git clone https://github.com/yourusername/doctor-appointment-system.git
 cd doctor-appointment-system
+
+
+MONGO_URI=mongodb://localhost:27017/doctor_appointment
+JWT_SECRET=your_secure_jwt_secret
+PORT=3000
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+STRIPE_SECRET_KEY=your_stripe_secret_key
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_email_password
