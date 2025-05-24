@@ -57,5 +57,62 @@ SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_email_password
 
 ## Frontend (.env)
-VITE_API_URL=http://localhost:3000/api
+VITE_API_URL=http://localhost:5173
 VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+
+
+## Admin (.env)
+VITE_API_URL=http://localhost:5174
+VITE_ADMIN_SECRET=your_admin_secret
+
+
+## Running the System
+# Backend
+cd backend && npm install && npm start
+
+# Frontend (Patient)
+cd ../frontend && npm install && npm run dev
+
+# Admin Panel
+cd ../admin && npm install && npm run dev
+
+
+🗃️ Database Setup
+Install MongoDB
+
+Start service:
+
+sudo systemctl start mongod
+
+Verify:
+
+sudo systemctl status mongod
+
+
+☁️ Cloudinary Setup
+Sign up at Cloudinary
+
+Get credentials from dashboard
+
+Add to backend/.env
+
+
+💳 Stripe Setup
+Create account at Stripe
+
+Get API keys from developer dashboard
+
+Add to both backend and frontend .env files
+
+
+
+🤝 Contributing
+Fork the repository
+
+Create your feature branch (git checkout -b feature/AmazingFeature)
+
+Commit your changes (git commit -m 'Add some amazing feature')
+
+Push to the branch (git push origin feature/AmazingFeature)
+
+Open a pull request
