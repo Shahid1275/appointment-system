@@ -55,3 +55,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_email_password
+
+## Frontend (.env)
+VITE_API_URL=http://localhost:3000/api
+VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
