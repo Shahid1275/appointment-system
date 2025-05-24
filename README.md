@@ -111,7 +111,6 @@ VITE_ADMIN_SECRET=your_admin_secret
 
 
 ## Running the System
-Development Mode
 
 # Backend
 cd backend 
